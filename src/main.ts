@@ -1,4 +1,5 @@
-import { App, Editor, Plugin, PluginSettingTab, Setting } from "npm:obsidian";
+import { App, Editor, Notice, Plugin, PluginSettingTab, Setting } from "npm:obsidian";
+import { UnlockModal } from "./UnlockModal.ts";
 
 interface NoteLockSettings {
   keyGroup: string;
@@ -74,6 +75,61 @@ export default class NoteLock extends Plugin {
           "```";
         editor.replaceSelection(replacement);
       },
+    });
+
+    // NOTE: 註冊代碼塊渲染器
+    this.registerMarkdownCodeBlockProcessor("notelock", (source, el, ctx) => {
+      const lines = source.split("\n");
+      let publicContent = "";
+      let inPublicSection = false;
+
+      for (const line of lines) {
+        if (line.trim() === "-- Public --") {
+          inPublicSection = true;
+          continue;
+        }
+        if (line.trim().startsWith("-- Key Group --")) {
+          inPublicSection = false;
+          break;
+        }
+        if (inPublicSection) {
+          publicContent += line + "\n";
+        }
+      }
+
+      const container = el.createEl("div");
+      container.classList.add("notelock-block");
+
+      const publicDisplay = container.createEl("div");
+      publicDisplay.classList.add("notelock-public");
+      publicDisplay.textContent = publicContent.trim();
+
+      const lockIcon = container.createEl("span");
+      lockIcon.classList.add("notelock-icon");
+      lockIcon.textContent = "🔒";
+
+      container.onclick = async () => {
+        let keyGroupNames: string[] = [];
+        try {
+          const keyData = JSON.parse(this.settings.keyGroup);
+          if (keyData.key_group && Array.isArray(keyData.key_group)) {
+            keyGroupNames = keyData.key_group.map((kg: any) => kg.name);
+          }
+        } catch (e) {
+          new Notice("Error parsing Key Group data. Check settings.");
+          console.error(e);
+          return;
+        }
+
+        const modal = new UnlockModal(this.app, keyGroupNames);
+        try {
+          const result = await modal.openAndAwaitResult();
+          new Notice(`Selected Key Group: ${result.selectedKeyGroupName}, Password: ${result.password}`);
+          // TODO: Implement decryption logic here using the selected key group and password
+        } catch (error) {
+          new Notice(`Modal dismissed: ${error}`);
+        }
+      };
     });
   }
 
