@@ -1,10 +1,10 @@
 import { App, Editor, Plugin, PluginSettingTab, Setting } from "npm:obsidian";
 
-interface MyPluginSettings {
+interface NoteLockSettings {
   keyGroup: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: NoteLockSettings = {
   keyGroup: JSON.stringify(
     {
       "key_group": [],
@@ -15,9 +15,9 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 };
 
 class SampleSettingTab extends PluginSettingTab {
-  plugin: MyPlugin;
+  plugin: NoteLock;
 
-  constructor(app: App, plugin: MyPlugin) {
+  constructor(app: App, plugin: NoteLock) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -47,8 +47,8 @@ class SampleSettingTab extends PluginSettingTab {
   }
 }
 
-export default class MyPlugin extends Plugin {
-  settings: MyPluginSettings;
+export default class NoteLock extends Plugin {
+  settings: NoteLockSettings;
 
   async onload() {
     await this.loadSettings();
