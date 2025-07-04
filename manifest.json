@@ -1,0 +1,9 @@
+{
+    "id": "obsidian-note-lock",
+    "name": "Note Lock",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "加密筆記區塊使筆記更安全",
+    "author": "BwayCer <bwaycer@gmail.com>",
+    "isDesktopOnly": false
+}
