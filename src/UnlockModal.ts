@@ -1,7 +1,7 @@
 import { App, Modal, Setting, Notice } from 'npm:obsidian';
 
 interface UnlockModalResult {
-    selectedKeyGroupName: string;
+    selectedKeyName: string;
     password: string;
 }
 
@@ -10,14 +10,14 @@ export class UnlockModal extends Modal {
     private reject: (reason?: any) => void;
     private submitted = false;
 
-    private keyGroupNames: string[];
-    private selectedKeyGroupName: string;
+    private keyNames: string[];
+    private selectedKeyName: string;
     private password: string;
 
-    constructor(app: App, keyGroupNames: string[]) {
+    constructor(app: App, keyNames: string[]) {
         super(app);
-        this.keyGroupNames = keyGroupNames;
-        this.selectedKeyGroupName = keyGroupNames.length > 0 ? keyGroupNames[0] : '';
+        this.keyNames = keyNames;
+        this.selectedKeyName = keyNames.length > 0 ? keyNames[0] : '';
         this.password = '';
     };
 
@@ -26,16 +26,16 @@ export class UnlockModal extends Modal {
 
         this.titleEl.setText('Unlock Note');
 
-        // Key Group Dropdown
+        // Key Dropdown
         new Setting(contentEl)
-            .setName('Select Key Group')
+            .setName('Select Key')
             .addDropdown(dropdown => {
-                this.keyGroupNames.forEach(name => {
+                this.keyNames.forEach(name => {
                     dropdown.addOption(name, name);
                 });
-                dropdown.setValue(this.selectedKeyGroupName);
+                dropdown.setValue(this.selectedKeyName);
                 dropdown.onChange(value => {
-                    this.selectedKeyGroupName = value;
+                    this.selectedKeyName = value;
                 });
             });
 
@@ -69,7 +69,7 @@ export class UnlockModal extends Modal {
 
         if (this.submitted) {
             this.resolve({
-                selectedKeyGroupName: this.selectedKeyGroupName,
+                selectedKeyName: this.selectedKeyName,
                 password: this.password,
             });
         } else {

@@ -1,14 +1,21 @@
-import { App, Editor, Notice, Plugin, PluginSettingTab, Setting } from "npm:obsidian";
+import {
+  App,
+  Editor,
+  Notice,
+  Plugin,
+  PluginSettingTab,
+  Setting,
+} from "npm:obsidian";
 import { UnlockModal } from "./UnlockModal.ts";
 
 interface NoteLockSettings {
-  keyGroup: string;
+  data: string;
 }
 
 const DEFAULT_SETTINGS: NoteLockSettings = {
-  keyGroup: JSON.stringify(
+  data: JSON.stringify(
     {
-      "key_group": [],
+      "keys": [],
     },
     null,
     2,
@@ -30,18 +37,18 @@ class SampleSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Data setting")
-      .setDesc("like key groups")
+      .setDesc("like keys")
       .addTextArea((text) => {
         text.inputEl.style.height = "150px";
         text.inputEl.style.width = "100%";
         text
           .setPlaceholder(
             "Enter your data like:\n" +
-              `"{ "key_group": [ { "name": "<金鑰名稱>", "key": "aD1Dfa6..." } ] }"`,
+              `"{ "keys": [ { "name": "<金鑰名稱>", "key": "aD1Dfa6..." } ] }"`,
           )
-          .setValue(this.plugin.settings.keyGroup)
+          .setValue(this.plugin.settings.data)
           .onChange(async (value) => {
-            this.plugin.settings.keyGroup = value;
+            this.plugin.settings.data = value;
             await this.plugin.saveSettings();
           });
       });
@@ -68,7 +75,7 @@ export default class NoteLock extends Plugin {
         const replacement = "```notelock\n" +
           "-- Public --\n" +
           "公開內容...\n" +
-          "-- Key Group --\n" +
+          "-- Key --\n" +
           "銀行相關\n" +
           "-- Ciphertext --\n" +
           `${selection}\n` +
@@ -88,7 +95,7 @@ export default class NoteLock extends Plugin {
           inPublicSection = true;
           continue;
         }
-        if (line.trim().startsWith("-- Key Group --")) {
+        if (line.trim().startsWith("-- Key --")) {
           inPublicSection = false;
           break;
         }
@@ -109,23 +116,25 @@ export default class NoteLock extends Plugin {
       lockIcon.textContent = "🔒";
 
       container.onclick = async () => {
-        let keyGroupNames: string[] = [];
+        let keyNames: string[] = [];
         try {
-          const keyData = JSON.parse(this.settings.keyGroup);
-          if (keyData.key_group && Array.isArray(keyData.key_group)) {
-            keyGroupNames = keyData.key_group.map((kg: any) => kg.name);
+          const data = JSON.parse(this.settings.data);
+          if (data.keys && Array.isArray(data.keys)) {
+            keyNames = data.keys.map((kg: any) => kg.name);
           }
         } catch (e) {
-          new Notice("Error parsing Key Group data. Check settings.");
+          new Notice("Error parsing Key data. Check settings.");
           console.error(e);
           return;
         }
 
-        const modal = new UnlockModal(this.app, keyGroupNames);
+        const modal = new UnlockModal(this.app, keyNames);
         try {
           const result = await modal.openAndAwaitResult();
-          new Notice(`Selected Key Group: ${result.selectedKeyGroupName}, Password: ${result.password}`);
-          // TODO: Implement decryption logic here using the selected key group and password
+          new Notice(
+            `Selected Key: ${result.selectedKeyName}, Password: ${result.password}`,
+          );
+          // TODO: Implement decryption logic here using the selected key and password
         } catch (error) {
           new Notice(`Modal dismissed: ${error}`);
         }
