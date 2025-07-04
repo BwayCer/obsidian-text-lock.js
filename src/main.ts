@@ -1,4 +1,4 @@
-import { App, Plugin, PluginSettingTab, Setting } from "obsidian";
+import { App, Editor, Plugin, PluginSettingTab, Setting } from "npm:obsidian";
 
 interface MyPluginSettings {
   keyGroup: string;
@@ -56,6 +56,25 @@ export default class MyPlugin extends Plugin {
     // NOTE: 設定面板
     // This adds a settings tab so the user can configure various aspects of the plugin
     this.addSettingTab(new SampleSettingTab(this.app, this));
+
+    // NOTE: 增加命令操作
+    // This adds an editor command that can perform some operation on the current editor instance
+    this.addCommand({
+      id: "encrypt-selection",
+      name: "Encrypt selection",
+      editorCallback: (editor: Editor) => {
+        const selection = editor.getSelection();
+        const replacement = "```notelock\n" +
+          "-- Public --\n" +
+          "公開內容...\n" +
+          "-- Key Group --\n" +
+          "銀行相關\n" +
+          "-- Ciphertext --\n" +
+          `${selection}\n` +
+          "```";
+        editor.replaceSelection(replacement);
+      },
+    });
   }
 
   onunload() {
