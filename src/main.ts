@@ -111,10 +111,6 @@ export default class NoteLock extends Plugin {
       publicDisplay.classList.add("notelock-public");
       publicDisplay.textContent = publicContent.trim();
 
-      const lockIcon = container.createEl("span");
-      lockIcon.classList.add("notelock-icon");
-      lockIcon.textContent = "🔒";
-
       container.onclick = async () => {
         let keyNames: string[] = [];
         try {

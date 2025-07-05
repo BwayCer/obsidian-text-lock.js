@@ -1,0 +1,24 @@
+.notelock-block {
+  position: relative;
+  min-height: 150px;
+  background-color: var(--background-secondary);
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.notelock-block::after {
+  display: block;
+  content: "🔒";
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  font-size: 28px;
+  pointer-events: none;
+  background: #8787877a;
+}
+
+.notelock-public {
+  color: var(--text-faint);
+  white-space: pre-wrap; /* Ensures content wraps and respects newlines */
+}
