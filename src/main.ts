@@ -16,6 +16,15 @@ interface NoteLockSettings {
   data: string;
 }
 
+interface NoteLockDataKeys {
+  name: string;
+  key: string;
+}
+
+interface NoteLockData {
+  keys: NoteLockDataKeys[];
+}
+
 interface ParseCodeBlockResult {
   publicContent: string;
   keyName: string;
@@ -30,7 +39,7 @@ interface KeyValueItem {
 const DEFAULT_SETTINGS: NoteLockSettings = {
   data: JSON.stringify(
     {
-      "keys": [],
+      keys: [],
     },
     null,
     2,
@@ -71,9 +80,9 @@ class SampleSettingTab extends PluginSettingTab {
 }
 
 export default class NoteLock extends Plugin {
-  settings: NoteLockSettings;
+  settings!: NoteLockSettings;
 
-  async onload() {
+  override async onload() {
     await this.loadSettings();
 
     // NOTE: 設定面板
@@ -86,17 +95,7 @@ export default class NoteLock extends Plugin {
       id: "encrypt-selection",
       name: "Encrypt selection",
       editorCallback: async (editor: Editor) => {
-        let keyNames: string[] = [];
-        try {
-          const keyData = JSON.parse(this.settings.key);
-          if (keyData.key && Array.isArray(keyData.key)) {
-            keyNames = keyData.key.map((k: any) => k.name);
-          }
-        } catch (e) {
-          new Notice("Error parsing Key data. Check settings.");
-          console.error(e);
-          return;
-        }
+        const keyNames = this.getKeyNames();
 
         const selection = editor.getSelection();
         const modal = new EditModal(this.app, keyNames, selection);
@@ -123,10 +122,10 @@ export default class NoteLock extends Plugin {
     });
 
     // NOTE: 註冊代碼塊渲染器
-    this.registerMarkdownCodeBlockProcessor("notelock", (source, el, ctx) => {
+    this.registerMarkdownCodeBlockProcessor("notelock", (source, el, _ctx) => {
       const {
         publicContent,
-        keyName,
+        // keyName,
         ciphertext,
       } = this.parseCodeBlock(source);
 
@@ -173,7 +172,7 @@ export default class NoteLock extends Plugin {
           try {
             const result = await modal.openAndAwaitResult();
             new Notice(
-              `Selected Key: ${result.selectedKeyName}, Password: ${result.password}`,
+              `Selected Key: ${result.selectedKeyName}, Password: ${result.plaintext}`,
             );
             // TODO: Implement decryption logic here using the selected key and password
           } catch (error) {
@@ -184,20 +183,18 @@ export default class NoteLock extends Plugin {
     });
   }
 
-  onunload() {
-  }
+  // onunload() {}
 
   getKeyNames() {
     let keyNames: string[] = [];
     try {
-      const data = JSON.parse(this.settings.data);
+      const data: NoteLockData = JSON.parse(this.settings.data);
       if (data.keys && Array.isArray(data.keys)) {
-        keyNames = data.keys.map((kg: any) => kg.name);
+        keyNames = data.keys.map((item) => item.name);
       }
     } catch (err) {
       new Notice("Error parsing Key data. Check settings.");
       console.error(err);
-      return [];
     }
     return keyNames;
   }

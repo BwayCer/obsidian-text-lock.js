@@ -1,4 +1,9 @@
 {
+  "compilerOptions": {
+    "lib": [
+      "dom",
+    ],
+  },
   "tasks": {
     "build": "deno run -A ./build.ts"
   },

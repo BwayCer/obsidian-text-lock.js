@@ -1,4 +1,4 @@
-import { App, debounce, Modal, Notice, Setting } from "npm:obsidian";
+import { App, Modal, Notice } from "npm:obsidian";
 
 interface KeyValueItem {
   key: string;
@@ -13,7 +13,7 @@ export class KeyValueDisplayModal extends Modal {
     this.data = data;
   }
 
-  onOpen() {
+  override onOpen() {
     const { contentEl } = this;
     this.titleEl.setText("Unlocked Key-Value Data");
 
@@ -60,7 +60,7 @@ export class KeyValueDisplayModal extends Modal {
     });
   }
 
-  onClose() {
+  override onClose() {
     const { contentEl } = this;
     contentEl.empty();
   }

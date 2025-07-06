@@ -17,7 +17,7 @@ export class DisplayModal extends Modal {
     this.content = content;
   }
 
-  onOpen() {
+  override onOpen() {
     const { contentEl } = this;
     this.titleEl.setText("Unlocked Content");
 
@@ -46,7 +46,7 @@ export class DisplayModal extends Modal {
       });
   }
 
-  onClose() {
+  override onClose() {
     const { contentEl } = this;
     contentEl.empty();
   }

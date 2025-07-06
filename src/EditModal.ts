@@ -1,4 +1,4 @@
-import { App, Modal, Notice, Setting } from "npm:obsidian";
+import { App, Modal, Setting } from "npm:obsidian";
 
 interface EditModalResult {
   selectedKeyName: string;
@@ -6,8 +6,8 @@ interface EditModalResult {
 }
 
 export class EditModal extends Modal {
-  private resolve: (value: EditModalResult) => void;
-  private reject: (reason?: any) => void;
+  private resolve!: (value: EditModalResult) => void;
+  private reject!: (reason?: any) => void;
   private submitted = false;
 
   private keyNames: string[];
@@ -21,7 +21,7 @@ export class EditModal extends Modal {
     this.plaintext = initialPlaintext;
   }
 
-  onOpen() {
+  override onOpen() {
     const { contentEl } = this;
 
     this.titleEl.setText("Edit Note");
@@ -64,7 +64,7 @@ export class EditModal extends Modal {
       });
   }
 
-  onClose() {
+  override onClose() {
     const { contentEl } = this;
     contentEl.empty();
 

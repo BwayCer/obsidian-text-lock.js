@@ -1,5 +1,8 @@
 import { build } from "https://deno.land/x/dnt@0.40.0/mod.ts";
 import { rollup } from "npm:rollup";
+import terserMod from "npm:@rollup/plugin-terser";
+
+const terser = terserMod as unknown as typeof terserMod.default;
 
 await build({
   entryPoints: ["./src/main.ts"],
@@ -23,8 +26,20 @@ await build({
   async postBuild() {
     const bundle = await rollup({
       input: "./target/npm/esm/main.js",
-      plugins: [],
-      external: ["obsidian"],
+      plugins: [
+        terser({
+          compress: false, // 不進行壓縮
+          mangle: false, // 不改變變數名稱
+          format: {
+            beautify: true,
+            comments: false, // 移除所有註解
+            indent_level: 2,
+          },
+        }),
+      ],
+      external: [
+        "obsidian",
+      ],
     });
 
     await bundle.write({

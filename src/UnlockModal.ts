@@ -1,4 +1,4 @@
-import { App, Modal, Notice, Setting } from "npm:obsidian";
+import { App, Modal, Setting } from "npm:obsidian";
 
 interface UnlockModalResult {
   selectedKeyName: string;
@@ -6,8 +6,8 @@ interface UnlockModalResult {
 }
 
 export class UnlockModal extends Modal {
-  private resolve: (value: UnlockModalResult) => void;
-  private reject: (reason?: any) => void;
+  private resolve!: (value: UnlockModalResult) => void;
+  private reject!: (reason?: any) => void;
   private submitted = false;
 
   private keyNames: string[];
@@ -21,7 +21,7 @@ export class UnlockModal extends Modal {
     this.password = "";
   }
 
-  onOpen() {
+  override onOpen() {
     const { contentEl } = this;
 
     this.titleEl.setText("Unlock Note");
@@ -63,7 +63,7 @@ export class UnlockModal extends Modal {
       });
   }
 
-  onClose() {
+  override onClose() {
     const { contentEl } = this;
     contentEl.empty();
 
