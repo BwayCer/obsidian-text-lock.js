@@ -9,9 +9,22 @@ import {
 } from "npm:obsidian";
 import { UnlockModal } from "./UnlockModal.ts";
 import { EditModal } from "./EditModal.ts";
+import { DisplayModal } from "./DisplayModal.ts";
+import { KeyValueDisplayModal } from "./KeyValueDisplayModal.ts";
 
 interface NoteLockSettings {
   data: string;
+}
+
+interface ParseCodeBlockResult {
+  publicContent: string;
+  keyName: string;
+  ciphertext: string;
+}
+
+interface KeyValueItem {
+  key: string;
+  value: string;
 }
 
 const DEFAULT_SETTINGS: NoteLockSettings = {
@@ -111,23 +124,11 @@ export default class NoteLock extends Plugin {
 
     // NOTE: 註冊代碼塊渲染器
     this.registerMarkdownCodeBlockProcessor("notelock", (source, el, ctx) => {
-      const lines = source.split("\n");
-      let publicContent = "";
-      let inPublicSection = false;
-
-      for (const line of lines) {
-        if (line.trim() === "-- Public --") {
-          inPublicSection = true;
-          continue;
-        }
-        if (line.trim().startsWith("-- Key --")) {
-          inPublicSection = false;
-          break;
-        }
-        if (inPublicSection) {
-          publicContent += line + "\n";
-        }
-      }
+      const {
+        publicContent,
+        keyName,
+        ciphertext,
+      } = this.parseCodeBlock(source);
 
       const container = el.createEl("div");
       container.classList.add("notelock-block");
@@ -140,25 +141,35 @@ export default class NoteLock extends Plugin {
         const keyNames = this.getKeyNames();
 
         // TODO: open unlock modal
+        const modal = new UnlockModal(this.app, keyNames);
+        try {
+          const result = await modal.openAndAwaitResult();
+          new Notice(
+            `Selected Key: ${result.selectedKeyName}, Password: ${result.password}`,
+          );
+        } catch (error) {
+          new Notice(`Modal dismissed: ${error}`);
+        }
+
+        // TODO:
+        const plaintext = ciphertext;
 
         const view = this.app.workspace.getActiveViewOfType(MarkdownView);
         if (view && view.getMode() === "preview") {
           // Reading view
-          const modal = new UnlockModal(this.app, keyNames);
-          try {
-            const result = await modal.openAndAwaitResult();
-            new Notice(
-              `Selected Key: ${result.selectedKeyName}, Password: ${result.password}`,
-            );
-            // TODO: Implement decryption logic here using the selected key and password
-          } catch (error) {
-            new Notice(`Modal dismissed: ${error}`);
+          const keyValuePairs = this.parseKeyValueContent(plaintext);
+          if (keyValuePairs) {
+            new KeyValueDisplayModal(this.app, keyValuePairs).open();
+          } else {
+            new DisplayModal(this.app, this, plaintext).open();
           }
         } else {
           // Editing view: show a notice (or open edit modal in the future)
-
-          // TODO: Editing in Live Preview is not yet supported from the reading view.
-          const modal = new EditModal(this.app, keyNames, "TODO decrypt plaintext");
+          const modal = new EditModal(
+            this.app,
+            keyNames,
+            plaintext,
+          );
           try {
             const result = await modal.openAndAwaitResult();
             new Notice(
@@ -197,5 +208,51 @@ export default class NoteLock extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+  }
+
+  parseCodeBlock(source: string): ParseCodeBlockResult {
+    const rtnData = {
+      publicContent: "",
+      keyName: "",
+      ciphertext: "",
+    };
+    let optionName = "";
+
+    const lines = source.split("\n");
+    for (const line of lines) {
+      switch (line.trim()) {
+        case "-- Public --":
+          optionName = "publicContent";
+          break;
+        case "-- Key --":
+          optionName = "keyName";
+          break;
+        case "-- Ciphertext --":
+          optionName = "ciphertext";
+          break;
+        default:
+          if (optionName != "") {
+            rtnData[optionName as keyof typeof rtnData] += line + "\n";
+          }
+      }
+    }
+
+    return rtnData;
+  }
+
+  parseKeyValueContent(content: string): KeyValueItem[] | null {
+    const lines = content.trim().split("\n");
+    const keyValuePairs: KeyValueItem[] = [];
+    for (const line of lines) {
+      if (line.includes(":")) {
+        const index = line.indexOf(":");
+        const key = line.slice(0, index);
+        const value = line.slice(index + 1).trim();
+        keyValuePairs.push({ key, value });
+      } else {
+        return null; // Not a key:value format
+      }
+    }
+    return keyValuePairs;
   }
 }
