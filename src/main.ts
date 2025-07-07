@@ -97,6 +97,7 @@ export default class TextLock extends Plugin {
       editorCallback: async (editor: Editor) => {
         const keyNames = this.getKeyNames();
 
+        this.selectEntireBlock(editor);
         const selection = editor.getSelection();
         const modal = new EditModal(this.app, keyNames, selection);
         try {
@@ -205,6 +206,24 @@ export default class TextLock extends Plugin {
 
   async saveSettings() {
     await this.saveData(this.settings);
+  }
+
+  selectEntireBlock(editor: Editor) {
+    const from = editor.getCursor("from");
+    const fromPosition = { line: from.line, ch: 0 };
+    const to = editor.getCursor("to");
+    const toPosition = {
+      line: to.line,
+      ch: editor.getLine(to.line).length,
+    };
+
+    editor.setSelection(fromPosition, toPosition);
+    // 如此則
+    // editor.getSelection();
+    // editor.replaceSelection(replacement);
+    // 可以替代
+    // editor.getRange(fromPosition, toPosition);
+    // editor.replaceRange(replacement, fromPosition, toPosition);
   }
 
   parseCodeBlock(source: string): ParseCodeBlockResult {
