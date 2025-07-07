@@ -12,17 +12,17 @@ import { EditModal } from "./EditModal.ts";
 import { DisplayModal } from "./DisplayModal.ts";
 import { KeyValueDisplayModal } from "./KeyValueDisplayModal.ts";
 
-interface NoteLockSettings {
+interface TextLockSettings {
   data: string;
 }
 
-interface NoteLockDataKeys {
+interface TextLockDataKeys {
   name: string;
   key: string;
 }
 
-interface NoteLockData {
-  keys: NoteLockDataKeys[];
+interface TextLockData {
+  keys: TextLockDataKeys[];
 }
 
 interface ParseCodeBlockResult {
@@ -36,7 +36,7 @@ interface KeyValueItem {
   value: string;
 }
 
-const DEFAULT_SETTINGS: NoteLockSettings = {
+const DEFAULT_SETTINGS: TextLockSettings = {
   data: JSON.stringify(
     {
       keys: [],
@@ -47,9 +47,9 @@ const DEFAULT_SETTINGS: NoteLockSettings = {
 };
 
 class SampleSettingTab extends PluginSettingTab {
-  plugin: NoteLock;
+  plugin: TextLock;
 
-  constructor(app: App, plugin: NoteLock) {
+  constructor(app: App, plugin: TextLock) {
     super(app, plugin);
     this.plugin = plugin;
   }
@@ -79,8 +79,8 @@ class SampleSettingTab extends PluginSettingTab {
   }
 }
 
-export default class NoteLock extends Plugin {
-  settings!: NoteLockSettings;
+export default class TextLock extends Plugin {
+  settings!: TextLockSettings;
 
   override async onload() {
     await this.loadSettings();
@@ -106,7 +106,7 @@ export default class NoteLock extends Plugin {
           );
 
           // TODO: Implement encryption and replacement logic here
-          const replacement = "```notelock\n" +
+          const replacement = "```textlock\n" +
             "-- Public --\n" +
             "公開內容...\n" +
             "-- Key --\n" +
@@ -122,7 +122,7 @@ export default class NoteLock extends Plugin {
     });
 
     // NOTE: 註冊代碼塊渲染器
-    this.registerMarkdownCodeBlockProcessor("notelock", (source, el, _ctx) => {
+    this.registerMarkdownCodeBlockProcessor("textlock", (source, el, _ctx) => {
       const {
         publicContent,
         // keyName,
@@ -130,10 +130,10 @@ export default class NoteLock extends Plugin {
       } = this.parseCodeBlock(source);
 
       const container = el.createEl("div");
-      container.classList.add("notelock-block");
+      container.classList.add("textlock-block");
 
       const publicDisplay = container.createEl("div");
-      publicDisplay.classList.add("notelock-public");
+      publicDisplay.classList.add("textlock-public");
       publicDisplay.textContent = publicContent.trim();
 
       container.onclick = async () => {
@@ -188,7 +188,7 @@ export default class NoteLock extends Plugin {
   getKeyNames() {
     let keyNames: string[] = [];
     try {
-      const data: NoteLockData = JSON.parse(this.settings.data);
+      const data: TextLockData = JSON.parse(this.settings.data);
       if (data.keys && Array.isArray(data.keys)) {
         keyNames = data.keys.map((item) => item.name);
       }

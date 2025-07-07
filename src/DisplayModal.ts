@@ -23,7 +23,7 @@ export class DisplayModal extends Modal {
 
     // Create a container for the rendered content
     const renderContainer = contentEl.createEl("div");
-    renderContainer.addClass("notelock-display-content");
+    renderContainer.addClass("textlock-display-content");
 
     // Use MarkdownRenderer to display the content
     MarkdownRenderer.render(
@@ -36,7 +36,7 @@ export class DisplayModal extends Modal {
 
     // Add a setting for the copy button
     new Setting(contentEl)
-      .setClass("notelock-copy-button-container")
+      .setClass("textlock-copy-button-container")
       .addButton((button) => {
         button.setButtonText("Copy")
           .onClick(() => {

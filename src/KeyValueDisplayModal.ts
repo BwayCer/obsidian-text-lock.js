@@ -19,26 +19,26 @@ export class KeyValueDisplayModal extends Modal {
 
     this.data.forEach((item) => {
       const itemContainer = contentEl.createEl("div");
-      itemContainer.addClass("notelock-key-value-row");
+      itemContainer.addClass("textlock-key-value-row");
 
       const keyEl = itemContainer.createEl("span", { text: item.key + ": " });
-      keyEl.addClass("notelock-key");
+      keyEl.addClass("textlock-key");
 
       const valueContainer = itemContainer.createEl("span");
-      valueContainer.addClass("notelock-value-container");
+      valueContainer.addClass("textlock-value-container");
 
       const hiddenValueEl = valueContainer.createEl("span", { text: "***" });
-      hiddenValueEl.addClass("notelock-hidden-value");
+      hiddenValueEl.addClass("textlock-hidden-value");
 
       const visibleValueEl = valueContainer.createEl("span", { text: item.value });
-      visibleValueEl.addClass("notelock-visible-value");
+      visibleValueEl.addClass("textlock-visible-value");
       visibleValueEl.style.display = "none"; // Hidden by default
 
       const actionsContainer = itemContainer.createEl("span");
-      actionsContainer.addClass("notelock-key-value-actions");
+      actionsContainer.addClass("textlock-key-value-actions");
 
       const toggleButton = actionsContainer.createEl("span", { text: "👁️" });
-      toggleButton.addClass("notelock-toggle-visibility");
+      toggleButton.addClass("textlock-toggle-visibility");
       toggleButton.onclick = () => {
         if (hiddenValueEl.style.display === "none") {
           hiddenValueEl.style.display = "inline";
@@ -52,7 +52,7 @@ export class KeyValueDisplayModal extends Modal {
       };
 
       const copyButton = actionsContainer.createEl("span", { text: "📋" });
-      copyButton.addClass("notelock-copy-value");
+      copyButton.addClass("textlock-copy-value");
       copyButton.onclick = () => {
         navigator.clipboard.writeText(item.value);
         new Notice("Value copied to clipboard!");

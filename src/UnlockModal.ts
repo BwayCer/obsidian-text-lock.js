@@ -24,7 +24,7 @@ export class UnlockModal extends Modal {
   override onOpen() {
     const { contentEl } = this;
 
-    this.titleEl.setText("Unlock Note");
+    this.titleEl.setText("Unlock Text");
 
     // Key Dropdown
     new Setting(contentEl)

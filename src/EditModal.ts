@@ -24,7 +24,7 @@ export class EditModal extends Modal {
   override onOpen() {
     const { contentEl } = this;
 
-    this.titleEl.setText("Edit Note");
+    this.titleEl.setText("Edit Text");
 
     // Key Dropdown
     new Setting(contentEl)
