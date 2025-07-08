@@ -8,9 +8,17 @@ await build({
   entryPoints: ["./src/main.ts"],
   outDir: "./target/npm",
 
+  typeCheck: "both", // TS 檢查. 有效值: both, single (不清楚差異)
+  // https://github.com/denoland/dnt/blob/main/README.md#dom-types
+  compilerOptions: {
+    lib: [
+      "ES2021",
+      "DOM",
+    ],
+  },
+
   // 控制哪些格式要產出
   scriptModule: false, // 不輸出 CommonJS
-  typeCheck: false, // 不檢查型別（可以加快速度）
   declaration: false, // 不輸出 .d.ts 型別檔
   test: false, // 不輸出測試檔
 
