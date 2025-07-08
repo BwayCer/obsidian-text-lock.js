@@ -65,16 +65,7 @@ export class TextLockSettingTab extends PluginSettingTab {
   async importAction() {
     const configTxt = JSON.stringify(config, null, 2);
     const modal = new ImportModal(this.app, configTxt);
-
-    let result;
-    try {
-      result = await modal.openAndAwaitResult();
-    } catch (err) {
-      console.error(err);
-      const msg = err instanceof Error ? err.message : String(err);
-      new Notice(msg);
-      return;
-    }
+    const result = await modal.openAndAwaitResult();
 
     if (!result.isSubmitted || !result.isChanged) {
       return;
