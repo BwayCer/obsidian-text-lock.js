@@ -8,6 +8,7 @@ import {
 } from "./data.ts";
 import type TextLock from "./main.ts";
 import { ImportModal } from "./ImportModal.ts";
+import { KeyModal, KeyModalMode } from "./KeyModal.ts";
 
 export class TextLockSettingTab extends PluginSettingTab {
   plugin: TextLock;
@@ -21,7 +22,7 @@ export class TextLockSettingTab extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
 
-    containerEl.createEl("h2", {
+    containerEl.createEl("h1", {
       text: langText("setting_tab__config__title"),
     });
 
@@ -60,6 +61,77 @@ export class TextLockSettingTab extends PluginSettingTab {
           }
         });
       });
+
+    containerEl.createDiv("setting-item");
+
+    containerEl.createEl("h2", {
+      text: langText("setting_tab__keys__title"),
+    });
+
+    config.keys.forEach((keyInfo, index) => {
+      const { name, cryptoScheme, key } = keyInfo;
+      new Setting(containerEl)
+        .setName(name)
+        .addButton((button) =>
+          button
+            .setButtonText(langText("setting_tab__keys__rename_btn_text"))
+            .onClick(async () => {
+              const modal = new KeyModal(
+                this.app,
+                KeyModalMode.Rename,
+                name,
+              );
+              const result = await modal.openAndAwaitResult();
+
+              if (result.isSubmitted) {
+                keyInfo.name = result.name;
+              }
+            })
+        )
+        .addButton((button) =>
+          button
+            .setButtonText(langText("setting_tab__keys__update_btn_text"))
+            .onClick(async () => {
+              const modal = new KeyModal(
+                this.app,
+                KeyModalMode.Update,
+                name,
+                (password: string): boolean => {
+                  // TODO: 驗證密碼是否正確
+                  return false;
+                },
+              );
+              const result = await modal.openAndAwaitResult();
+              console.log(result);
+
+              // TODO: 生成新金鑰
+            })
+        )
+        .addButton((button) =>
+          button
+            .setButtonText(langText("setting_tab__keys__delete_btn_text"))
+            .onClick(async () => {
+              config.keys.splice(index, 1);
+              await this.plugin.saveSettings();
+              this.display();
+            })
+        );
+    });
+
+    new Setting(containerEl).addButton((button) =>
+      button
+        .setButtonText(langText("setting_tab__keys__create_btn_text"))
+        .onClick(async () => {
+          const modal = new KeyModal(
+            this.app,
+            KeyModalMode.Create,
+          );
+          const result = await modal.openAndAwaitResult();
+          console.log(result);
+
+          // TODO: 生成新金鑰
+        })
+    );
   }
 
   async importAction() {
