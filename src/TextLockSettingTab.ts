@@ -1,5 +1,12 @@
 import { App, Notice, PluginSettingTab, Setting } from "npm:obsidian";
-import { config, configPlaceholder, setNewConfig } from "./data.ts";
+import {
+  config,
+  configPlaceholder,
+  LangReadableCode,
+  langText,
+  setLang,
+  setNewConfig,
+} from "./data.ts";
 import type TextLock from "./main.ts";
 
 export class TextLockSettingTab extends PluginSettingTab {
@@ -12,11 +19,30 @@ export class TextLockSettingTab extends PluginSettingTab {
 
   display(): void {
     const { containerEl } = this;
-
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("Data setting")
+      .setName(langText("setting_tab__lang__language"))
+      .addDropdown((dropdown) => {
+        Object.entries(LangReadableCode).forEach(([key, val]) => {
+          dropdown.addOption(key, val);
+        });
+        dropdown.setValue(config.langCode);
+        dropdown.onChange(async (value) => {
+          const ok = setLang(value);
+          if (ok) {
+            await this.plugin.saveSettings();
+            this.display();
+          } else {
+            new Notice(langText("setting_tab__lang__not_found_lang", {
+              lang: value,
+            }));
+          }
+        });
+      });
+
+    new Setting(containerEl)
+      .setName(langText("setting_tab__config__title"))
       .setDesc("like keys")
       .addTextArea((text) => {
         const configTxt = JSON.stringify(config, null, 2);
@@ -31,9 +57,8 @@ export class TextLockSettingTab extends PluginSettingTab {
               newConfig = JSON.parse(value);
             } catch (err) {
               new Notice(
-                "Error parsing data from settings. Check the data format.",
+                langText("setting_tab__config__parse_data_format_error"),
               );
-              console.error(err);
               return;
             }
 
@@ -42,7 +67,7 @@ export class TextLockSettingTab extends PluginSettingTab {
               await this.plugin.saveSettings();
             } else {
               new Notice(
-                "Error type data from settings. Check the data format.",
+                langText("setting_tab__config__parse_data_content_error"),
               );
             }
           });

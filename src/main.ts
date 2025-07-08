@@ -1,10 +1,5 @@
-import {
-  Editor,
-  MarkdownView,
-  Notice,
-  Plugin,
-} from "npm:obsidian";
-import { config, setNewConfig } from "./data.ts";
+import { Editor, MarkdownView, Notice, Plugin } from "npm:obsidian";
+import { config, langText, setNewConfig } from "./data.ts";
 import { TextLockSettingTab } from "./TextLockSettingTab.ts";
 import { UnlockModal } from "./UnlockModal.ts";
 import { EditModal } from "./EditModal.ts";
@@ -34,7 +29,7 @@ export default class TextLock extends Plugin {
     // This adds an editor command that can perform some operation on the current editor instance
     this.addCommand({
       id: "encrypt-selection",
-      name: "Encrypt selection",
+      name: langText("command__encrypt_selection__name"),
       editorCallback: async (editor: Editor) => {
         const keyNames = this.getKeyNames();
 
@@ -137,7 +132,7 @@ export default class TextLock extends Plugin {
     const cacheConfig = await this.loadData();
     const isOk = setNewConfig(cacheConfig);
     if (!isOk) {
-      new Notice("Text Lock: Error type data from cache. Check the data format.");
+      new Notice(langText("base__parse_data_content_error"));
     }
   }
 
