@@ -5,12 +5,15 @@ import {
   LangReadableCode,
   langText as langText_,
 } from "./i18n/lang.ts";
+import { cryptoCan } from "./cryptoCan.ts";
+
+const cryptoSchemes = Reflect.ownKeys(cryptoCan) as (keyof typeof cryptoCan)[];
 
 export { LangReadableCode };
 
 export interface KeyInfo {
   name: string;
-  cryptoScheme: string;
+  cryptoScheme: keyof typeof cryptoCan;
   key: string;
 }
 
@@ -56,6 +59,10 @@ export function setLang(langCode: string): boolean {
   return true;
 }
 
+const isValidCryptoScheme = (cryptoScheme: any): boolean => {
+  return cryptoSchemes.includes(cryptoScheme);
+};
+
 export function setNewConfig(newConfig: any): boolean {
   const originLangCode = config.langCode;
   let langCode;
@@ -71,7 +78,7 @@ export function setNewConfig(newConfig: any): boolean {
     for (const keyInfo of newConfig.keys) {
       if (
         typeof keyInfo.name === "string" &&
-        typeof keyInfo.cryptoScheme === "string" &&
+        isValidCryptoScheme(keyInfo.cryptoScheme) &&
         typeof keyInfo.key === "string"
       ) {
         keys.push({

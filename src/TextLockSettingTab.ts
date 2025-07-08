@@ -1,11 +1,13 @@
 import { App, Notice, PluginSettingTab, Setting } from "npm:obsidian";
 import {
   config,
+  KeyInfo,
   LangReadableCode,
   langText,
   setLang,
   setNewConfig,
 } from "./data.ts";
+import { cryptoCan } from "./cryptoCan.ts";
 import type TextLock from "./main.ts";
 import { ImportModal } from "./ImportModal.ts";
 import { KeyModal, KeyModalMode } from "./KeyModal.ts";
@@ -69,9 +71,9 @@ export class TextLockSettingTab extends PluginSettingTab {
     });
 
     config.keys.forEach((keyInfo, index) => {
-      const { name, cryptoScheme, key } = keyInfo;
+      const keyName = keyInfo.name;
       new Setting(containerEl)
-        .setName(name)
+        .setName(keyName)
         .addButton((button) =>
           button
             .setButtonText(langText("setting_tab__keys__rename_btn_text"))
@@ -79,33 +81,22 @@ export class TextLockSettingTab extends PluginSettingTab {
               const modal = new KeyModal(
                 this.app,
                 KeyModalMode.Rename,
-                name,
+                keyName,
               );
               const result = await modal.openAndAwaitResult();
 
               if (result.isSubmitted) {
                 keyInfo.name = result.name;
+                await this.plugin.saveSettings();
+                new Notice(langText("setting_tab__keys__name_updated_notice"));
+                this.display();
               }
             })
         )
         .addButton((button) =>
           button
             .setButtonText(langText("setting_tab__keys__update_btn_text"))
-            .onClick(async () => {
-              const modal = new KeyModal(
-                this.app,
-                KeyModalMode.Update,
-                name,
-                (password: string): boolean => {
-                  // TODO: 驗證密碼是否正確
-                  return false;
-                },
-              );
-              const result = await modal.openAndAwaitResult();
-              console.log(result);
-
-              // TODO: 生成新金鑰
-            })
+            .onClick(async () => await this.updateKeyAction(keyInfo))
         )
         .addButton((button) =>
           button
@@ -113,6 +104,9 @@ export class TextLockSettingTab extends PluginSettingTab {
             .onClick(async () => {
               config.keys.splice(index, 1);
               await this.plugin.saveSettings();
+              new Notice(
+                langText("setting_tab__keys__password_deleted_notice"),
+              );
               this.display();
             })
         );
@@ -121,16 +115,7 @@ export class TextLockSettingTab extends PluginSettingTab {
     new Setting(containerEl).addButton((button) =>
       button
         .setButtonText(langText("setting_tab__keys__create_btn_text"))
-        .onClick(async () => {
-          const modal = new KeyModal(
-            this.app,
-            KeyModalMode.Create,
-          );
-          const result = await modal.openAndAwaitResult();
-          console.log(result);
-
-          // TODO: 生成新金鑰
-        })
+        .onClick(async () => await this.createKeyAction())
     );
   }
 
@@ -165,5 +150,73 @@ export class TextLockSettingTab extends PluginSettingTab {
     }
 
     this.display();
+  }
+
+  async createKeyAction() {
+    const modal = new KeyModal(
+      this.app,
+      KeyModalMode.Create,
+    );
+    const modalResult = await modal.openAndAwaitResult();
+
+    if (!modalResult.isSubmitted) {
+      return;
+    }
+
+    const createKeyResult = cryptoCan[modalResult.cryptoScheme].createKey(
+      modalResult.password,
+    );
+    if (!createKeyResult.ok) {
+      new Notice(
+        langText("setting_tab__keys__password_create_failed_notice"),
+      );
+    }
+
+    config.keys.push({
+      name: modalResult.name,
+      cryptoScheme: modalResult.cryptoScheme,
+      key: createKeyResult.text,
+    });
+    await this.plugin.saveSettings();
+    new Notice(
+      langText("setting_tab__keys__password_created_notice"),
+    );
+    this.display();
+  }
+
+  async updateKeyAction(keyInfo: KeyInfo) {
+    const { name: keyName, cryptoScheme, key } = keyInfo;
+    const cryptoKit = cryptoCan[cryptoScheme];
+
+    const modal = new KeyModal(
+      this.app,
+      KeyModalMode.Update,
+      keyName,
+      (password: string): boolean => {
+        return cryptoKit.isCorrect(password, key);
+      },
+    );
+    const modalResult = await modal.openAndAwaitResult();
+
+    if (!modalResult.isSubmitted) {
+      return;
+    }
+
+    const reencryptKeyResult = cryptoKit.reencryptKey(
+      modalResult.oldPassword,
+      key,
+      modalResult.password,
+    );
+    if (!reencryptKeyResult.ok) {
+      new Notice(
+        langText("setting_tab__keys__password_update_failed_notice"),
+      );
+    }
+
+    keyInfo.key = reencryptKeyResult.text;
+    await this.plugin.saveSettings();
+    new Notice(
+      langText("setting_tab__keys__password_updated_notice"),
+    );
   }
 }

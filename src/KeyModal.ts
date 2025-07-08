@@ -2,7 +2,6 @@ import { App, Modal, Notice, Setting } from "npm:obsidian";
 import { langText } from "./data.ts";
 import { cryptoCan } from "./cryptoCan.ts";
 
-// const cryptoSchemes = Reflect.ownKeys(cryptoCan) as string[];
 const cryptoSchemes = Reflect.ownKeys(cryptoCan) as (keyof typeof cryptoCan)[];
 
 const DEFULT_CRYPTO_SCHEMES = cryptoSchemes[0] as keyof typeof cryptoCan;
@@ -178,19 +177,19 @@ export class KeyModal extends Modal {
         .addText((text) =>
           text.onChange((value) => (updateInfo.oldPassword = value))
         );
+    } else {
+      new Setting(contentEl)
+        .setName(langText("key_modal__crypto_scheme_select_text"))
+        .addDropdown((dropdown) => {
+          cryptoSchemes.forEach((name) => {
+            dropdown.addOption(name, name);
+          });
+          dropdown.setValue(DEFULT_CRYPTO_SCHEMES);
+          dropdown.onChange((value) => {
+            updateInfo.cryptoScheme = value as keyof typeof cryptoCan;
+          });
+        });
     }
-
-    new Setting(contentEl)
-      .setName(langText("key_modal__crypto_scheme_select_text"))
-      .addDropdown((dropdown) => {
-        cryptoSchemes.forEach((name) => {
-          dropdown.addOption(name, name);
-        });
-        dropdown.setValue(DEFULT_CRYPTO_SCHEMES);
-        dropdown.onChange((value) => {
-          updateInfo.cryptoScheme = value as keyof typeof cryptoCan;
-        });
-      });
 
     new Setting(contentEl)
       .setName(title)

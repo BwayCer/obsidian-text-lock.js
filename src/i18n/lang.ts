@@ -15,6 +15,12 @@ export interface LangPkg {
   setting_tab__keys__rename_btn_text: string;
   setting_tab__keys__update_btn_text: string;
   setting_tab__keys__delete_btn_text: string;
+  setting_tab__keys__password_created_notice: string;
+  setting_tab__keys__password_create_failed_notice: string;
+  setting_tab__keys__name_updated_notice: string;
+  setting_tab__keys__password_updated_notice: string;
+  setting_tab__keys__password_update_failed_notice: string;
+  setting_tab__keys__password_deleted_notice: string;
   import_modal__title: string;
   import_modal__btn_text: string;
   key_modal__create_title: string;
