@@ -1,29 +1,15 @@
 import {
-  App,
   Editor,
   MarkdownView,
   Notice,
   Plugin,
-  PluginSettingTab,
-  Setting,
 } from "npm:obsidian";
+import { config, setNewConfig } from "./data.ts";
+import { TextLockSettingTab } from "./TextLockSettingTab.ts";
 import { UnlockModal } from "./UnlockModal.ts";
 import { EditModal } from "./EditModal.ts";
 import { DisplayModal } from "./DisplayModal.ts";
 import { KeyValueDisplayModal } from "./KeyValueDisplayModal.ts";
-
-interface TextLockSettings {
-  data: string;
-}
-
-interface TextLockDataKeys {
-  name: string;
-  key: string;
-}
-
-interface TextLockData {
-  keys: TextLockDataKeys[];
-}
 
 interface ParseCodeBlockResult {
   publicContent: string;
@@ -36,58 +22,13 @@ interface KeyValueItem {
   value: string;
 }
 
-const DEFAULT_SETTINGS: TextLockSettings = {
-  data: JSON.stringify(
-    {
-      keys: [],
-    },
-    null,
-    2,
-  ),
-};
-
-class SampleSettingTab extends PluginSettingTab {
-  plugin: TextLock;
-
-  constructor(app: App, plugin: TextLock) {
-    super(app, plugin);
-    this.plugin = plugin;
-  }
-
-  display(): void {
-    const { containerEl } = this;
-
-    containerEl.empty();
-
-    new Setting(containerEl)
-      .setName("Data setting")
-      .setDesc("like keys")
-      .addTextArea((text) => {
-        text.inputEl.style.height = "150px";
-        text.inputEl.style.width = "100%";
-        text
-          .setPlaceholder(
-            "Enter your data like:\n" +
-              `"{ "keys": [ { "name": "<金鑰名稱>", "key": "aD1Dfa6..." } ] }"`,
-          )
-          .setValue(this.plugin.settings.data)
-          .onChange(async (value) => {
-            this.plugin.settings.data = value;
-            await this.plugin.saveSettings();
-          });
-      });
-  }
-}
-
 export default class TextLock extends Plugin {
-  settings!: TextLockSettings;
-
   override async onload() {
     await this.loadSettings();
 
     // NOTE: 設定面板
     // This adds a settings tab so the user can configure various aspects of the plugin
-    this.addSettingTab(new SampleSettingTab(this.app, this));
+    this.addSettingTab(new TextLockSettingTab(this.app, this));
 
     // NOTE: 增加命令操作
     // This adds an editor command that can perform some operation on the current editor instance
@@ -184,28 +125,25 @@ export default class TextLock extends Plugin {
     });
   }
 
-  // onunload() {}
+  // override async onunload() {
+  //   await this.saveSettings();
+  // }
 
   getKeyNames() {
-    let keyNames: string[] = [];
-    try {
-      const data: TextLockData = JSON.parse(this.settings.data);
-      if (data.keys && Array.isArray(data.keys)) {
-        keyNames = data.keys.map((item) => item.name);
-      }
-    } catch (err) {
-      new Notice("Error parsing Key data. Check settings.");
-      console.error(err);
-    }
-    return keyNames;
+    return config.keys.map((item) => item.name);
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const cacheConfig = await this.loadData();
+    const isOk = setNewConfig(cacheConfig);
+    if (!isOk) {
+      new Notice("Text Lock: Error type data from cache. Check the data format.");
+    }
   }
 
   async saveSettings() {
-    await this.saveData(this.settings);
+    // 儲存到 plugin/data.json
+    await this.saveData(config);
   }
 
   selectEntireBlock(editor: Editor) {
