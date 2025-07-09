@@ -135,6 +135,8 @@ export class KeyModal extends Modal {
   }
 
   override onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
     this.resolve(this.result);
   }
 
