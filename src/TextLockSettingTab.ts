@@ -71,9 +71,10 @@ export class TextLockSettingTab extends PluginSettingTab {
     });
 
     config.keys.forEach((keyInfo, index) => {
-      const keyName = keyInfo.name;
+      const { name: keyName, cryptoScheme } = keyInfo;
       new Setting(containerEl)
         .setName(keyName)
+        .setDesc(cryptoScheme)
         .addButton((button) =>
           button
             .setButtonText(langText("setting_tab__keys__rename_btn_text"))
