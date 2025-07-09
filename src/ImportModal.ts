@@ -28,7 +28,7 @@ export class ImportModal extends Modal {
     this.titleEl.setText(langText("import_modal__title"));
 
     const textBoxElem = contentEl.createDiv("setting-item");
-    const textElem = contentEl.createEl("textarea", {
+    const textElem = textBoxElem.createEl("textarea", {
       text: this.data,
     });
     textElem.style.width = "100%";
@@ -39,7 +39,6 @@ export class ImportModal extends Modal {
       this.result.data = (evt.currentTarget as HTMLTextAreaElement)?.value ??
         "";
     });
-    textBoxElem.appendChild(textElem);
 
     new Setting(contentEl).addButton((button) =>
       button
