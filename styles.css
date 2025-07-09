@@ -1,10 +1,26 @@
 .textlock-block {
   position: relative;
-  min-height: 150px;
-  background-color: var(--background-secondary);
+  min-height: 60px;
   padding: 10px;
+  padding-left: 30px;
   border-radius: 5px;
+  background-color: var(--background-secondary);
   cursor: pointer;
+}
+
+.markdown-preview-view .textlock-block {
+  margin: 1em 0px;
+}
+
+.textlock-block::before {
+  display: block;
+  content: "";
+  width: 15px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  background: #8787877a;
 }
 
 .textlock-block::after {
@@ -13,9 +29,10 @@
   position: absolute;
   top: 0px;
   left: 0px;
-  font-size: 28px;
+  font-size: 24px;
   pointer-events: none;
-  background: #8787877a;
+  opacity: 0.6;
+  z-index: 1000;
 }
 
 .textlock-public {
@@ -31,25 +48,41 @@
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.textlock-key {
-  font-weight: bold;
-  flex-grow: 1;
-}
 
-.textlock-value-container {
-  flex-grow: 2;
-  text-align: right;
-  font-size: 1.2em; /* Larger font size for value */
-}
+/* DisplayModal */
 
-.textlock-toggle-visibility,
-.textlock-copy-value {
+.text-lock--display-modal--line-container {
+  /* --font-ui-medium: 1.1em; */
+}
+.text-lock--display-modal--line-container--line-container {
+  font-size: var(--font-ui-medium);
+}
+.text-lock--display-modal--line-container--line-container::before {
+  display: inline-block;
+  content: "✱✱✱✱✱✱";
+}
+.text-lock--display-modal--line-container--line-container > .mark-toggle-btn,
+.text-lock--display-modal--line-container--line-container > .mark-copy-btn {
+  display: inline-block;
   margin-left: 10px;
   cursor: pointer;
   opacity: 0.7;
 }
-
-.textlock-toggle-visibility:hover,
-.textlock-copy-value:hover {
+.text-lock--display-modal--line-container--line-container > .mark-toggle-btn::after {
+  display: block;
+  content: "˃ᴗ˂";
+}
+.text-lock--display-modal--line-container--line-container > .mark-copy-btn::after {
+  display: block;
+  content: "📋";
+}
+.text-lock--display-modal--line-container--line-container > .mark-toggle-btn:hover,
+.text-lock--display-modal--line-container--line-container > .mark-copy-btn:hover {
   opacity: 1;
+}
+.text-lock--display-modal--line-container--line-container[data-value]::before {
+  content: attr(data-value);
+}
+.text-lock--display-modal--line-container--line-container[data-value] > .mark-toggle-btn::after {
+  content: "°⌓°";
 }

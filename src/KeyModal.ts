@@ -94,7 +94,7 @@ export class KeyModal extends Modal {
         .onClick(() => {
           if (this.mode !== KeyModalMode.Update) {
             if (updateInfo.name === "") {
-              new Notice(langText("key_modal__empty_name"));
+              new Notice(langText("key_modal__empty_name_notice"));
               return;
             }
 
@@ -102,11 +102,11 @@ export class KeyModal extends Modal {
           }
           if (this.mode !== KeyModalMode.Rename) {
             if (updateInfo.password === "") {
-              new Notice(langText("key_modal__empty_password"));
+              new Notice(langText("key_modal__empty_password_notice"));
               return;
             }
             if (updateInfo.password !== updateInfo.confirmPassword) {
-              new Notice(langText("key_modal__password_not_match"));
+              new Notice(langText("key_modal__password_not_match_notice"));
               return;
             }
 
@@ -117,7 +117,7 @@ export class KeyModal extends Modal {
                 typeof this.checkPassword !== "function" ||
                 !this.checkPassword(updateInfo.oldPassword)
               ) {
-                new Notice(langText("key_modal__password_incorrect"));
+                new Notice(langText("key_modal__password_incorrect_notice"));
                 return;
               }
 

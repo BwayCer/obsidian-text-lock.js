@@ -32,14 +32,31 @@ export interface LangPkg {
   key_modal__password_input_text: string;
   key_modal__new_password_input_text: string;
   key_modal__confirm_password_input_text: string;
-  key_modal__empty_name: string;
-  key_modal__empty_password: string;
-  key_modal__password_not_match: string;
-  key_modal__password_incorrect: string;
+  key_modal__empty_name_notice: string;
+  key_modal__empty_password_notice: string;
+  key_modal__password_not_match_notice: string;
+  key_modal__password_incorrect_notice: string;
   base__parse_data_content_error: string;
   command__encrypt_selection__name: string;
+  unlock_modal__unlock_title: string;
+  unlock_modal__lock_title: string;
+  unlock_modal__select_key_input_text: string;
+  unlock_modal__password_input_text: string;
+  unlock_modal__plaintext_input_text: string;
+  unlock_modal__empty_key_name_notice: string;
+  unlock_modal__empty_plaintext_notice: string;
+  unlock_modal__password_incorrect_notice: string;
+  display_modal__title: string;
+  app__replace_public_hint: string;
+  app__code_block_format_error_notice: string;
+  app__unlock_error_notice: string;
+  app__lock_notice: string;
+  app__lock_error_notice: string;
+  app__replace_action_error_notice: string;
   general__copied_to_clipboard: string;
+  general__copy: string;
   general__submit: string;
+  general__submit_save: string;
 }
 
 export enum LangReadableCode {

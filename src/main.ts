@@ -1,10 +1,9 @@
 import { Editor, MarkdownView, Notice, Plugin } from "npm:obsidian";
-import { config, langText, setNewConfig } from "./data.ts";
+import { config, KeyInfo, langText, setNewConfig } from "./data.ts";
+import { cryptoCan } from "./cryptoCan.ts";
 import { TextLockSettingTab } from "./TextLockSettingTab.ts";
-import { UnlockModal } from "./UnlockModal.ts";
-import { EditModal } from "./EditModal.ts";
+import { UnlockModal, UnlockModalMode } from "./UnlockModal.ts";
 import { DisplayModal } from "./DisplayModal.ts";
-import { KeyValueDisplayModal } from "./KeyValueDisplayModal.ts";
 
 interface ParseCodeBlockResult {
   publicContent: string;
@@ -12,121 +11,59 @@ interface ParseCodeBlockResult {
   ciphertext: string;
 }
 
-interface KeyValueItem {
-  key: string;
-  value: string;
-}
-
 export default class TextLock extends Plugin {
   override async onload() {
     await this.loadSettings();
 
     // NOTE: 設定面板
-    // This adds a settings tab so the user can configure various aspects of the plugin
     this.addSettingTab(new TextLockSettingTab(this.app, this));
 
     // NOTE: 增加命令操作
-    // This adds an editor command that can perform some operation on the current editor instance
     this.addCommand({
       id: "encrypt-selection",
       name: langText("command__encrypt_selection__name"),
       editorCallback: async (editor: Editor) => {
-        const keyNames = this.getKeyNames();
-
         this.selectEntireBlock(editor);
         const selection = editor.getSelection();
-        const modal = new EditModal(this.app, keyNames, selection);
-        try {
-          const result = await modal.openAndAwaitResult();
-          new Notice(
-            `Selected Key: ${result.selectedKeyName}, Plaintext: ${result.plaintext}`,
-          );
 
-          // TODO: Implement encryption and replacement logic here
-          const replacement = "```textlock\n" +
-            "-- Public --\n" +
-            "公開內容...\n" +
-            "-- Key --\n" +
-            "銀行相關\n" +
-            "-- Ciphertext --\n" +
-            `${result.plaintext}\n` +
-            "```";
-          editor.replaceSelection(replacement);
-        } catch (error) {
-          new Notice(`Modal dismissed: ${error}`);
+        const keyNames = this.getKeyNames();
+        const modal = new UnlockModal(
+          this.app,
+          UnlockModalMode.Lock,
+          this.checkPassword.bind(this),
+          keyNames,
+          keyNames[0],
+          "",
+          selection,
+        );
+        const result = await modal.openAndAwaitResult();
+        if (!result.isSubmitted) {
+          return;
         }
+
+        const replacement = this.getReplacement(
+          false,
+          result.password,
+          result.keyName,
+          langText("app__replace_public_hint") + "\n" + result.plaintext,
+          result.plaintext,
+        );
+        if (replacement) {
+          editor.replaceSelection(replacement);
+          new Notice(langText("app__lock_notice"));
+          return;
+        }
+
+        new Notice(langText("app__lock_error_notice"));
       },
     });
 
     // NOTE: 註冊代碼塊渲染器
-    this.registerMarkdownCodeBlockProcessor("textlock", (source, el, _ctx) => {
-      const {
-        publicContent,
-        // keyName,
-        ciphertext,
-      } = this.parseCodeBlock(source);
-
-      const container = el.createEl("div");
-      container.classList.add("textlock-block");
-
-      const publicDisplay = container.createEl("div");
-      publicDisplay.classList.add("textlock-public");
-      publicDisplay.textContent = publicContent.trim();
-
-      container.onclick = async () => {
-        const keyNames = this.getKeyNames();
-
-        // TODO: open unlock modal
-        const modal = new UnlockModal(this.app, keyNames);
-        try {
-          const result = await modal.openAndAwaitResult();
-          new Notice(
-            `Selected Key: ${result.selectedKeyName}, Password: ${result.password}`,
-          );
-        } catch (error) {
-          new Notice(`Modal dismissed: ${error}`);
-        }
-
-        // TODO:
-        const plaintext = ciphertext;
-
-        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-        if (view && view.getMode() === "preview") {
-          // Reading view
-          const keyValuePairs = this.parseKeyValueContent(plaintext);
-          if (keyValuePairs) {
-            new KeyValueDisplayModal(this.app, keyValuePairs).open();
-          } else {
-            new DisplayModal(this.app, this, plaintext).open();
-          }
-        } else {
-          // Editing view: show a notice (or open edit modal in the future)
-          const modal = new EditModal(
-            this.app,
-            keyNames,
-            plaintext,
-          );
-          try {
-            const result = await modal.openAndAwaitResult();
-            new Notice(
-              `Selected Key: ${result.selectedKeyName}, Password: ${result.plaintext}`,
-            );
-            // TODO: Implement decryption logic here using the selected key and password
-          } catch (error) {
-            new Notice(`Modal dismissed: ${error}`);
-          }
-        }
-      };
-    });
+    this.addTextlockCodeBlockProcessor();
   }
 
-  // override async onunload() {
-  //   await this.saveSettings();
+  // override async onunload() { await this.saveSettings();
   // }
-
-  getKeyNames() {
-    return config.keys.map((item) => item.name);
-  }
 
   async loadSettings() {
     const cacheConfig = await this.loadData();
@@ -141,7 +78,15 @@ export default class TextLock extends Plugin {
     await this.saveData(config);
   }
 
-  selectEntireBlock(editor: Editor) {
+  private getKeyNames() {
+    return config.keys.map((item) => item.name);
+  }
+
+  private getKeyInfo(keyName: string): KeyInfo | null {
+    return config.keys.find((item) => item.name === keyName) ?? null;
+  }
+
+  private selectEntireBlock(editor: Editor) {
     const from = editor.getCursor("from");
     const fromPosition = { line: from.line, ch: 0 };
     const to = editor.getCursor("to");
@@ -159,7 +104,49 @@ export default class TextLock extends Plugin {
     // editor.replaceRange(replacement, fromPosition, toPosition);
   }
 
-  parseCodeBlock(source: string): ParseCodeBlockResult {
+  private checkPassword(password: string, keyName: string): boolean {
+    const keyInfo = this.getKeyInfo(keyName);
+    if (keyInfo) {
+      const { cryptoScheme, key } = keyInfo;
+      return cryptoCan[cryptoScheme].isCorrect(password, key);
+    }
+    return false;
+  }
+
+  private getReplacement(
+    isInnerEditing: boolean,
+    password: string,
+    keyName: string,
+    publicContent: string,
+    plaintext: string,
+  ): string | null {
+    const keyInfo = this.getKeyInfo(keyName);
+    if (keyInfo) {
+      const { cryptoScheme, key } = keyInfo;
+      const encryptResult = cryptoCan[cryptoScheme].encrypt(
+        password,
+        key,
+        plaintext,
+      );
+      if (encryptResult.ok) {
+        let replacement = "-- Public --\n" +
+          `${publicContent}\n` +
+          "-- Key --\n" +
+          `${keyName}\n` +
+          "-- Ciphertext --\n" +
+          `${encryptResult.text}`;
+        if (!isInnerEditing) {
+          replacement = "```textlock\n" + replacement + "\n```";
+        }
+
+        return replacement;
+      }
+    }
+
+    return null;
+  }
+
+  private parseCodeBlock(source: string): ParseCodeBlockResult {
     const rtnData = {
       publicContent: "",
       keyName: "",
@@ -186,22 +173,126 @@ export default class TextLock extends Plugin {
       }
     }
 
+    rtnData.publicContent = rtnData.publicContent.trim();
+    rtnData.keyName = rtnData.keyName.trim();
+    rtnData.ciphertext = rtnData.ciphertext.trim();
+
     return rtnData;
   }
 
-  parseKeyValueContent(content: string): KeyValueItem[] | null {
-    const lines = content.trim().split("\n");
-    const keyValuePairs: KeyValueItem[] = [];
-    for (const line of lines) {
-      if (line.includes(":")) {
-        const index = line.indexOf(":");
-        const key = line.slice(0, index);
-        const value = line.slice(index + 1).trim();
-        keyValuePairs.push({ key, value });
-      } else {
-        return null; // Not a key:value format
+  private addTextlockCodeBlockProcessor() {
+    this.registerMarkdownCodeBlockProcessor("textlock", (source, el, ctx) => {
+      let {
+        publicContent,
+        keyName,
+        ciphertext,
+      } = this.parseCodeBlock(source);
+
+      const isCodeBlockFormatError = keyName === "" || ciphertext === "";
+      if (isCodeBlockFormatError) {
+        publicContent = langText("app__code_block_format_error_notice");
       }
-    }
-    return keyValuePairs;
+
+      const container = el.createEl("div");
+      container.classList.add("textlock-block");
+
+      const publicDisplay = container.createEl("div");
+      publicDisplay.classList.add("textlock-public");
+      publicDisplay.textContent = publicContent;
+
+      container.onclick = async () => {
+        if (isCodeBlockFormatError) {
+          new Notice(langText("app__code_block_format_error_notice"));
+          return;
+        }
+
+        const keyNames = this.getKeyNames();
+        const modal = new UnlockModal(
+          this.app,
+          UnlockModalMode.Unlock,
+          this.checkPassword.bind(this),
+          keyNames,
+          keyName,
+        );
+        const unlockModalResult = await modal.openAndAwaitResult();
+
+        if (!unlockModalResult.isSubmitted) {
+          return;
+        }
+
+        let plaintext!: string;
+        const keyInfo = this.getKeyInfo(unlockModalResult.keyName);
+        if (keyInfo) {
+          const { cryptoScheme, key } = keyInfo;
+          const encryptResult = cryptoCan[cryptoScheme].decrypt(
+            unlockModalResult.password,
+            key,
+            ciphertext,
+          );
+          if (encryptResult.ok) {
+            plaintext = encryptResult.text;
+          } else {
+            new Notice(langText("app__unlock_error_notice"));
+            return;
+          }
+        }
+
+        const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+        switch (view && view.getMode()) {
+          // case null: // 沒開啟文章吧?!
+          case "preview":
+            new DisplayModal(this.app, this, plaintext).open();
+            break;
+          case "source": {
+            const editor = view!.editor;
+            const sectionInfo = ctx.getSectionInfo(el);
+            if (!sectionInfo) {
+              new Notice(langText("app__replace_action_error_notice"));
+              return;
+            }
+
+            const fromPosition = { line: sectionInfo.lineStart + 1, ch: 0 };
+            const toPosition = {
+              line: sectionInfo.lineEnd - 1,
+              ch: editor.getLine(sectionInfo.lineEnd - 1).length,
+            };
+
+            // Editing view: show a notice (or open edit modal in the future)
+            const modal = new UnlockModal(
+              this.app,
+              UnlockModalMode.Lock,
+              this.checkPassword.bind(this),
+              keyNames,
+              unlockModalResult.keyName,
+              unlockModalResult.password,
+              plaintext,
+            );
+            const result = await modal.openAndAwaitResult();
+            if (!result.isSubmitted) {
+              return;
+            }
+
+            const replacement = this.getReplacement(
+              true,
+              result.password,
+              result.keyName,
+              publicContent,
+              result.plaintext,
+            );
+            if (replacement) {
+              editor.replaceRange(replacement, fromPosition, toPosition);
+
+              new Notice(langText("app__lock_notice"));
+              return;
+            }
+
+            new Notice(langText("app__lock_error_notice"));
+            break;
+          }
+          default:
+            break;
+        }
+      };
+    });
   }
 }
