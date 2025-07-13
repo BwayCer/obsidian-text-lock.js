@@ -4,13 +4,13 @@ export interface CryptoMethodResult {
 }
 
 export interface CryptoKit {
-  createKey(password: string): CryptoMethodResult;
-  isCorrect(password: string, key: string): boolean;
-  reencryptKey(password: string, key: string, newPassword: string): CryptoMethodResult;
-  encrypt(password: string, key: string, plainText: string): CryptoMethodResult;
+  createKey(password: string): Promise<CryptoMethodResult>;
+  isCorrect(password: string, key: string): Promise<boolean>;
+  reencryptKey(password: string, key: string, newPassword: string): Promise<CryptoMethodResult>;
+  encrypt(password: string, key: string, plainText: string): Promise<CryptoMethodResult>;
   decrypt(
     password: string,
     key: string,
     cipherText: string,
-  ): CryptoMethodResult;
+  ): Promise<CryptoMethodResult>;
 }

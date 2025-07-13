@@ -41,7 +41,7 @@ export default class TextLock extends Plugin {
           return;
         }
 
-        const replacement = this.getReplacement(
+        const replacement = await this.getReplacement(
           false,
           result.password,
           result.keyName,
@@ -104,26 +104,26 @@ export default class TextLock extends Plugin {
     // editor.replaceRange(replacement, fromPosition, toPosition);
   }
 
-  private checkPassword(password: string, keyName: string): boolean {
+  private async checkPassword(password: string, keyName: string): Promise<boolean> {
     const keyInfo = this.getKeyInfo(keyName);
     if (keyInfo) {
       const { cryptoScheme, key } = keyInfo;
-      return cryptoCan[cryptoScheme].isCorrect(password, key);
+      return await cryptoCan[cryptoScheme].isCorrect(password, key);
     }
     return false;
   }
 
-  private getReplacement(
+  private async getReplacement(
     isInnerEditing: boolean,
     password: string,
     keyName: string,
     publicContent: string,
     plaintext: string,
-  ): string | null {
+  ): Promise<string | null> {
     const keyInfo = this.getKeyInfo(keyName);
     if (keyInfo) {
       const { cryptoScheme, key } = keyInfo;
-      const encryptResult = cryptoCan[cryptoScheme].encrypt(
+      const encryptResult = await cryptoCan[cryptoScheme].encrypt(
         password,
         key,
         plaintext,
@@ -224,7 +224,7 @@ export default class TextLock extends Plugin {
         const keyInfo = this.getKeyInfo(unlockModalResult.keyName);
         if (keyInfo) {
           const { cryptoScheme, key } = keyInfo;
-          const encryptResult = cryptoCan[cryptoScheme].decrypt(
+          const encryptResult = await cryptoCan[cryptoScheme].decrypt(
             unlockModalResult.password,
             key,
             ciphertext,
@@ -272,7 +272,7 @@ export default class TextLock extends Plugin {
               return;
             }
 
-            const replacement = this.getReplacement(
+            const replacement = await this.getReplacement(
               true,
               result.password,
               result.keyName,

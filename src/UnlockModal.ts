@@ -1,7 +1,7 @@
 import { App, Modal, Notice, Setting } from "npm:obsidian";
 import { langText } from "./data.ts";
 
-type CheckPassword = (password: string, keyName: string) => boolean;
+type CheckPassword = (password: string, keyName: string) => Promise<boolean>;
 
 export enum UnlockModalMode {
   Unlock,
@@ -73,7 +73,7 @@ export class UnlockModal extends Modal {
         button
           .setButtonText(langText("general__submit_save"))
           .setCta()
-          .onClick(() => {
+          .onClick(async () => {
             const { keyName, password, plaintext } = this.result;
 
             if (keyName === "") {
@@ -92,7 +92,7 @@ export class UnlockModal extends Modal {
               new Notice(langText("key_modal__empty_password_notice"));
               return;
             } else if (
-              !this.checkPassword(password, keyName)
+              !(await this.checkPassword(password, keyName))
             ) {
               new Notice(langText("unlock_modal__password_incorrect_notice"));
               return;

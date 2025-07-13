@@ -6,7 +6,7 @@ const cryptoSchemes = Reflect.ownKeys(cryptoCan) as (keyof typeof cryptoCan)[];
 
 const DEFULT_CRYPTO_SCHEMES = cryptoSchemes[0] as keyof typeof cryptoCan;
 
-type CheckPassword = (password: string) => boolean;
+type CheckPassword = (password: string) => Promise<boolean>;
 
 export enum KeyModalMode {
   Create,
@@ -91,7 +91,7 @@ export class KeyModal extends Modal {
     new Setting(contentEl).addButton((button) =>
       button
         .setButtonText(langText("general__submit"))
-        .onClick(() => {
+        .onClick(async () => {
           if (this.mode !== KeyModalMode.Update) {
             if (updateInfo.name === "") {
               new Notice(langText("key_modal__empty_name_notice"));
@@ -115,7 +115,7 @@ export class KeyModal extends Modal {
               if (
                 updateInfo.oldPassword === "" ||
                 typeof this.checkPassword !== "function" ||
-                !this.checkPassword(updateInfo.oldPassword)
+                !(await this.checkPassword(updateInfo.oldPassword))
               ) {
                 new Notice(langText("key_modal__password_incorrect_notice"));
                 return;

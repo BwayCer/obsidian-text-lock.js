@@ -164,7 +164,7 @@ export class TextLockSettingTab extends PluginSettingTab {
       return;
     }
 
-    const createKeyResult = cryptoCan[modalResult.cryptoScheme].createKey(
+    const createKeyResult = await cryptoCan[modalResult.cryptoScheme].createKey(
       modalResult.password,
     );
     if (!createKeyResult.ok) {
@@ -193,7 +193,7 @@ export class TextLockSettingTab extends PluginSettingTab {
       this.app,
       KeyModalMode.Update,
       keyName,
-      (password: string): boolean => {
+      (password: string): Promise<boolean> => {
         return cryptoKit.isCorrect(password, key);
       },
     );
@@ -203,7 +203,7 @@ export class TextLockSettingTab extends PluginSettingTab {
       return;
     }
 
-    const reencryptKeyResult = cryptoKit.reencryptKey(
+    const reencryptKeyResult = await cryptoKit.reencryptKey(
       modalResult.oldPassword,
       key,
       modalResult.password,
