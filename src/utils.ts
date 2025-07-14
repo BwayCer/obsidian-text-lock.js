@@ -17,7 +17,6 @@ export const createEnumValidator = function <
 export const createEnumValueValidator = function <
   E extends Record<string, string | number>,
 >(enumObj: E) {
-  Object.each;
   const enumValues = new Set(Object.values(enumObj));
   return (value: unknown): value is E[keyof E] =>
     enumValues.has(value as E[keyof E]);

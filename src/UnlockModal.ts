@@ -119,8 +119,6 @@ export class UnlockModal extends Modal {
   }
 
   addKeyBlockElem(contentEl: HTMLElement) {
-    const isLockMode = this.mode === UnlockModalMode.Lock;
-
     new Setting(contentEl)
       .setName(langText("unlock_modal__select_key_input_text"))
       .addDropdown((dropdown) => {
