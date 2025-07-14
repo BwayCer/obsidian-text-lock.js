@@ -1,5 +1,7 @@
 import { createLangSwitch } from "../utils.ts";
 import en_US_pkg from "./en_US.ts";
+import ja_JP_pkg from "./ja_JP.ts";
+import ko_KR_pkg from "./ko_KR.ts";
 import zh_TW_pkg from "./zh_TW.ts";
 
 export interface LangPkg {
@@ -62,11 +64,15 @@ export interface LangPkg {
 export enum LangReadableCode {
   en_US = "English",
   zh_TW = "中文",
+  ja_JP = "日本語",
+  ko_KR = "한국어",
 }
 
 export const langPkgMap = {
   en_US: en_US_pkg,
   zh_TW: zh_TW_pkg,
+  ja_JP: ja_JP_pkg,
+  ko_KR: ko_KR_pkg,
 };
 
 export const langText = createLangSwitch<LangPkg>(langPkgMap);
