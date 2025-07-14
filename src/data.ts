@@ -42,9 +42,20 @@ export let config: TextLockData = {
   keys: [],
 };
 
-export interface CacheData {}
+// 不要寫太清楚避免被搜尋
+export interface SimpleKeyCache {
+  nn: string;
+  pp: string;
+  kk: CryptoKey | null;
+}
 
-export const cacheData: CacheData = {};
+export interface CacheData {
+  sss: SimpleKeyCache;
+}
+
+export const cacheData: CacheData = {
+  sss: { nn: "", pp: "", kk: null },
+};
 
 export function langText(
   LangPkgKey: keyof LangPkg,
