@@ -1,5 +1,5 @@
 import { App, Modal, Notice, Setting } from "npm:obsidian";
-import { langText } from "../data.ts";
+import { isMobile, langText } from "../data.ts";
 
 type CheckPassword = (password: string, keyName: string) => Promise<boolean>;
 
@@ -135,7 +135,10 @@ export class UnlockModal extends Modal {
     new Setting(contentEl)
       .setName(langText("unlock_modal__password_input_text"))
       .addText((text) => {
-        text.inputEl.type = "password";
+        // NOTE: 手機上為安全不給使用英文以外的鍵盤
+        if (!isMobile) {
+          text.inputEl.type = "password";
+        }
         text
           .setValue(this.result.password)
           .onChange((value) => {

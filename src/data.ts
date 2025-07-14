@@ -7,6 +7,8 @@ import {
 } from "./i18n/lang.ts";
 import { cryptoCan } from "./cryptoCan.ts";
 
+export const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
 const cryptoSchemes = Reflect.ownKeys(cryptoCan) as (keyof typeof cryptoCan)[];
 
 export { LangReadableCode };
