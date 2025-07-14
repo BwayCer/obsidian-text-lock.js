@@ -1,0 +1,9 @@
+{
+    "id": "obsidian-text-lock",
+    "name": "Text Lock",
+    "version": "1.0.0",
+    "minAppVersion": "0.15.0",
+    "description": "加密內容區塊使筆記更安全",
+    "author": "BwayCer <bwaycer@gmail.com>",
+    "isDesktopOnly": false
+}

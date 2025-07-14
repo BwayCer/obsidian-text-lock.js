@@ -1,0 +1,14 @@
+{
+  "tasks": {
+    "build": "deno run -A ./build.ts",
+    "reload/plugin": "deno cache --reload src/plugin.ts",
+  },
+  "compilerOptions": {
+    // deno 解釋器時有用, 但 dnt build 時沒用
+    "lib": [
+      "es2021",
+      // "esnext",
+      "dom",
+    ],
+  },
+}

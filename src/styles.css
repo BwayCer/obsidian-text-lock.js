@@ -1,0 +1,98 @@
+.textlock-block {
+  position: relative;
+  min-height: 60px;
+  padding: 10px;
+  padding-left: 30px;
+  border-radius: 5px;
+  background-color: var(--background-secondary);
+  cursor: pointer;
+}
+
+.markdown-preview-view .textlock-block {
+  margin: 1em 0px;
+}
+
+.textlock-block::before {
+  display: block;
+  content: "";
+  width: 15px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  background: #8787877a;
+}
+
+.textlock-block::after {
+  display: block;
+  content: "🔒";
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  font-size: 24px;
+  pointer-events: none;
+  opacity: 0.6;
+  z-index: 1000;
+}
+
+.textlock-public {
+  color: var(--text-faint);
+  white-space: pre-wrap; /* Ensures content wraps and respects newlines */
+}
+
+.textlock-key-value-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+
+/* DisplayModal */
+
+.text-lock--display-modal--line-container {
+  /* --font-ui-medium: 1.1em; */
+  display: block;
+}
+.text-lock--display-modal--line-container > .setting-item-control {
+  display: block;
+}
+.text-lock--display-modal--line-container--value {
+  font-size: var(--font-ui-medium);
+}
+.text-lock--display-modal--line-container--value::before {
+  display: inline-block;
+  content: "✱✱✱✱✱✱";
+}
+.text-lock--display-modal--line-container--value > .mark-toggle-btn,
+.text-lock--display-modal--line-container--value > .mark-copy-btn {
+  display: inline-block;
+  margin-left: 10px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.text-lock--display-modal--line-container--value > .mark-toggle-btn::after {
+  display: block;
+  content: "˃ᴗ˂";
+  width: 1.7em;
+  text-align: center;
+}
+.text-lock--display-modal--line-container--value > .mark-copy-btn::after {
+  display: block;
+  content: "📋";
+}
+.text-lock--display-modal--line-container--value > .mark-toggle-btn:hover,
+.text-lock--display-modal--line-container--value > .mark-copy-btn:hover {
+  opacity: 1;
+}
+.text-lock--display-modal--line-container--value[data-value]::before {
+  content: attr(data-value);
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.text-lock--display-modal--line-container--value[data-value] > .mark-toggle-btn::after {
+  content: "°⌓°";
+}
