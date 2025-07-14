@@ -53,36 +53,46 @@
 
 .text-lock--display-modal--line-container {
   /* --font-ui-medium: 1.1em; */
+  display: block;
 }
-.text-lock--display-modal--line-container--line-container {
+.text-lock--display-modal--line-container > .setting-item-control {
+  display: block;
+}
+.text-lock--display-modal--line-container--value {
   font-size: var(--font-ui-medium);
 }
-.text-lock--display-modal--line-container--line-container::before {
+.text-lock--display-modal--line-container--value::before {
   display: inline-block;
   content: "✱✱✱✱✱✱";
 }
-.text-lock--display-modal--line-container--line-container > .mark-toggle-btn,
-.text-lock--display-modal--line-container--line-container > .mark-copy-btn {
+.text-lock--display-modal--line-container--value > .mark-toggle-btn,
+.text-lock--display-modal--line-container--value > .mark-copy-btn {
   display: inline-block;
   margin-left: 10px;
   cursor: pointer;
   opacity: 0.7;
 }
-.text-lock--display-modal--line-container--line-container > .mark-toggle-btn::after {
+.text-lock--display-modal--line-container--value > .mark-toggle-btn::after {
   display: block;
   content: "˃ᴗ˂";
+  width: 1.7em;
+  text-align: center;
 }
-.text-lock--display-modal--line-container--line-container > .mark-copy-btn::after {
+.text-lock--display-modal--line-container--value > .mark-copy-btn::after {
   display: block;
   content: "📋";
 }
-.text-lock--display-modal--line-container--line-container > .mark-toggle-btn:hover,
-.text-lock--display-modal--line-container--line-container > .mark-copy-btn:hover {
+.text-lock--display-modal--line-container--value > .mark-toggle-btn:hover,
+.text-lock--display-modal--line-container--value > .mark-copy-btn:hover {
   opacity: 1;
 }
-.text-lock--display-modal--line-container--line-container[data-value]::before {
+.text-lock--display-modal--line-container--value[data-value]::before {
   content: attr(data-value);
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.text-lock--display-modal--line-container--line-container[data-value] > .mark-toggle-btn::after {
+.text-lock--display-modal--line-container--value[data-value] > .mark-toggle-btn::after {
   content: "°⌓°";
 }

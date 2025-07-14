@@ -80,9 +80,6 @@ export class DisplayModal extends Modal {
   }
 
   displayByKeyVal(contentEl: HTMLElement, data: KeyValueItem[]) {
-    // 當 css: margin 使用, 增加上方空間
-    contentEl.createDiv("setting-item");
-
     data.forEach((item) => {
       const lineContainer = contentEl.createDiv("setting-item");
       lineContainer.addClass("text-lock--display-modal--line-container");
@@ -95,7 +92,7 @@ export class DisplayModal extends Modal {
       // 秘密值畫面
       const secretValue = item.value;
       const secretBox = lineControlBox.createDiv(
-        "text-lock--display-modal--line-container--line-container",
+        "text-lock--display-modal--line-container--value",
       );
 
       secretBox
