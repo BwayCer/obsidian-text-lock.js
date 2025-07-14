@@ -6,9 +6,25 @@
   "compilerOptions": {
     // deno 解釋器時有用, 但 dnt build 時沒用
     "lib": [
+      // "deno.ns", // /// <reference lib="deno.ns" />
       "es2021",
       // "esnext",
       "dom",
     ],
+    // "types": [
+    //   "./types",
+    //   "./types/obsidian",
+    //   "obsidian",
+    //   "npm:obsidian",
+    //   "npm:obsidian-typings",
+    // ],
+    // "strict": true,
   },
+  // 若使用 @user 指向 github, 那 dnt 不會幫忙下載為本地文件
+  // 感覺 dnt 推薦把所有依賴都寫完整路徑, 也就是不要用到 `import` 選項.
+  // "imports": {
+  //   "obsidian": "npm:obsidian-typings"
+  //   "obsidian-typings": "npm:obsidian-typings@^3.12.1"
+  // },
+  // "nodeModulesDir": "auto",
 }

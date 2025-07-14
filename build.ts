@@ -8,10 +8,13 @@ import { isTest } from "./src/data.ts";
 
 const terser = terserMod as unknown as typeof terserMod.default;
 
+// // @ts-ignore: Deno 推斷錯誤，terser 是 default export function
+
 await build({
   entryPoints: ["./src/main.ts"],
   outDir: "./target/npm",
 
+  // typeCheck: false,
   typeCheck: "both", // TS 檢查. 有效值: both, single (不清楚差異)
   // https://github.com/denoland/dnt/blob/main/README.md#dom-types
   compilerOptions: {
