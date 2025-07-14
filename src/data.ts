@@ -12,6 +12,7 @@ export const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgen
 
 const cryptoSchemes = Reflect.ownKeys(cryptoCan) as (keyof typeof cryptoCan)[];
 
+// export type { LangPkg };
 export { LangReadableCode };
 
 export interface KeyInfo {
