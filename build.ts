@@ -1,3 +1,5 @@
+/// <reference lib="deno.ns" />
+
 import { build } from "https://deno.land/x/dnt@0.40.0/mod.ts";
 import { rollup } from "npm:rollup";
 import terserMod from "npm:@rollup/plugin-terser";
@@ -32,6 +34,8 @@ await build({
   },
 
   async postBuild() {
+    Deno.copyFileSync("./src/styles.css", "./styles.css");
+
     const bundle = await rollup({
       input: "./target/npm/esm/main.js",
       plugins: [
