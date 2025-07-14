@@ -1,8 +1,10 @@
 /// <reference lib="deno.ns" />
 
+import { ensureDir } from "https://deno.land/std@0.224.0/fs/ensure_dir.ts";
 import { build } from "https://deno.land/x/dnt@0.40.0/mod.ts";
 import { rollup } from "npm:rollup";
 import terserMod from "npm:@rollup/plugin-terser";
+import { isTest } from "./src/data.ts";
 
 const terser = terserMod as unknown as typeof terserMod.default;
 
@@ -34,7 +36,17 @@ await build({
   },
 
   async postBuild() {
-    Deno.copyFileSync("./src/styles.css", "./styles.css");
+    if (!isTest) {
+      await ensureDir("./target/obsidian");
+      Deno.copyFileSync(
+        "./manifest.json",
+        "./target/obsidian/manifest.json",
+      );
+    }
+    Deno.copyFileSync(
+      "./src/styles.css",
+      isTest ? "./styles.css" : "./target/obsidian/styles.css",
+    );
 
     const bundle = await rollup({
       input: "./target/npm/esm/main.js",
@@ -55,9 +67,9 @@ await build({
     });
 
     await bundle.write({
-      file: "./main.js",
+      file: isTest ? "./main.js" : "./target/obsidian/main.js",
       format: "cjs",
-      sourcemap: true,
+      sourcemap: isTest,
     });
 
     await bundle.close();

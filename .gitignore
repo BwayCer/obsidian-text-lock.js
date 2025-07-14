@@ -1,0 +1,9 @@
+# build
+/main.js
+/styles.css
+# dev
+/main.js.map
+/target
+
+# obsidian
+/data.json
