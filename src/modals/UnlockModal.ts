@@ -1,5 +1,5 @@
 import { App, Modal, Notice, Setting } from "npm:obsidian";
-import { langText } from "./data.ts";
+import { langText } from "../data.ts";
 
 type CheckPassword = (password: string, keyName: string) => Promise<boolean>;
 

@@ -1,5 +1,5 @@
 import { App, Modal, Setting } from "npm:obsidian";
-import { configPlaceholder, langText } from "./data.ts";
+import { configPlaceholder, langText } from "../data.ts";
 
 export interface ImportModalResult {
   isSubmitted: boolean;

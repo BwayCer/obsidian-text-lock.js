@@ -9,8 +9,8 @@ import {
 } from "./data.ts";
 import { cryptoCan } from "./cryptoCan.ts";
 import type TextLock from "./main.ts";
-import { ImportModal } from "./ImportModal.ts";
-import { KeyModal, KeyModalMode } from "./KeyModal.ts";
+import { ImportModal } from "./modals/ImportModal.ts";
+import { KeyModal, KeyModalMode } from "./modals/KeyModal.ts";
 
 export class TextLockSettingTab extends PluginSettingTab {
   plugin: TextLock;

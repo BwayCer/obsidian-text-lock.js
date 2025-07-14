@@ -1,6 +1,6 @@
 import { App, Modal, Notice, Setting } from "npm:obsidian";
-import { langText } from "./data.ts";
-import { cryptoCan } from "./cryptoCan.ts";
+import { langText } from "../data.ts";
+import { cryptoCan } from "../cryptoCan.ts";
 
 const cryptoSchemes = Reflect.ownKeys(cryptoCan) as (keyof typeof cryptoCan)[];
 

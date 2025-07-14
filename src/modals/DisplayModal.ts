@@ -6,7 +6,7 @@ import {
   Notice,
   Setting,
 } from "npm:obsidian";
-import { langText } from "./data.ts";
+import { langText } from "../data.ts";
 
 interface KeyValueItem {
   key: string;

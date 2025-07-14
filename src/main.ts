@@ -2,8 +2,8 @@ import { Editor, MarkdownView, Notice, Plugin } from "npm:obsidian";
 import { config, KeyInfo, langText, setNewConfig } from "./data.ts";
 import { cryptoCan } from "./cryptoCan.ts";
 import { TextLockSettingTab } from "./TextLockSettingTab.ts";
-import { UnlockModal, UnlockModalMode } from "./UnlockModal.ts";
-import { DisplayModal } from "./DisplayModal.ts";
+import { UnlockModal, UnlockModalMode } from "./modals/UnlockModal.ts";
+import { DisplayModal } from "./modals/DisplayModal.ts";
 
 interface ParseCodeBlockResult {
   publicContent: string;
