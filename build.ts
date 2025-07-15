@@ -52,10 +52,10 @@ await build({
       input: "./target/npm/esm/main.js",
       plugins: [
         terser({
-          compress: false, // 不進行壓縮
-          mangle: false, // 不改變變數名稱
+          compress: !isTest, // 測試時不進行壓縮
+          mangle: !isTest, // 測試時不改變變數名稱
           format: {
-            beautify: true,
+            beautify: isTest,
             comments: false, // 移除所有註解
             indent_level: 2,
           },
