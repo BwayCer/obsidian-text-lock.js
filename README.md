@@ -7,15 +7,15 @@
 ## 功能
 
 <div>
+  <img src="./looseLeaf/assets/desktop-03.webp" />
+  <img src="./looseLeaf/assets/desktop-01.webp" width="48%" />
   <img src="./looseLeaf/assets/desktop-02.webp" width="48%" />
-  <img src="./looseLeaf/assets/desktop-03.webp" width="48%" />
-  <img src="./looseLeaf/assets/desktop-01.webp" width="30%" />
-  <img src="./looseLeaf/assets/desktop-04.webp" width="30%" />
-  <img src="./looseLeaf/assets/desktop-05.webp" width="30%" />
+  <img src="./looseLeaf/assets/desktop-04.webp" width="48%" />
+  <img src="./looseLeaf/assets/desktop-05.webp" width="48%" />
 </div>
 <div>
-  <img src="./looseLeaf/assets/mobile-04.webp" height="250px" />
-  <img src="./looseLeaf/assets/mobile-05.webp" height="250px" />
+  <img src="./looseLeaf/assets/mobile-04.webp" width="230px" />
+  <img src="./looseLeaf/assets/mobile-05.webp" width="230px" />
 </div>
 
 
