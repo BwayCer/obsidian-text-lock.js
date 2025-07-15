@@ -64,6 +64,8 @@
 .text-lock--display-modal--line-container--value::before {
   display: inline-block;
   content: "✱✱✱✱✱✱";
+  width: 16em;
+  vertical-align: middle;
 }
 .text-lock--display-modal--line-container--value > .mark-toggle-btn,
 .text-lock--display-modal--line-container--value > .mark-copy-btn {
@@ -71,6 +73,7 @@
   margin-left: 10px;
   cursor: pointer;
   opacity: 0.7;
+  vertical-align: middle;
 }
 .text-lock--display-modal--line-container--value > .mark-toggle-btn::after {
   display: block;
@@ -88,11 +91,20 @@
 }
 .text-lock--display-modal--line-container--value[data-value]::before {
   content: attr(data-value);
-  max-width: 50%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .text-lock--display-modal--line-container--value[data-value] > .mark-toggle-btn::after {
   content: "°⌓°";
+}
+@media (max-width: 479.98px) {
+  .text-lock--display-modal--line-container--value::before {
+    max-width: 60%;
+  }
+}
+@media (min-width: 480px) {
+  .text-lock--display-modal--line-container--value::before {
+    max-width: 70%;
+  }
 }
