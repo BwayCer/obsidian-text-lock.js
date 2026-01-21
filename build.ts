@@ -31,7 +31,7 @@ await build({
   },
 
   package: {
-    name: "obsidian-note-lock",
+    name: "obsidian-text-lock",
     version: "1.0.0",
   },
 
